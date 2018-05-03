@@ -4,7 +4,6 @@ const express = require('express');
 const app = express();
 const FormData = require("form-data");
 
-const bodyParser = require("body-parser");
 //We use this create the SHA256 hash
 //const crypto = require("crypto");
 //pg-promise is a postgres library that uses javascript promises
