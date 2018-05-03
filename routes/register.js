@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                sendEmail("bmsg@uw.edu", email, "Welcome!", "<strong>Welcome to our app!</strong>");
+                sendEmail("cfb3@uw.edu", email, "Welcome!", "<strong>Welcome to our app!</strong>");
             }).catch((err) => {
                 //log the error
                 console.log(err);
