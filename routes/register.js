@@ -4,8 +4,6 @@ const express = require('express');
 const app = express();
 
 const bodyParser = require("body-parser");
-//This allows parsing of the body of POST requests, that are encoded in JSON
-app.use(bodyParser.json());
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
@@ -18,7 +16,7 @@ let getHash = require('../utilities/utils').getHash;
 let sendEmail = require('../utilities/utils').sendEmail;
 
 var router = express.Router();
-
+router.use(bodyParser.json());
 router.post('/', (req, res) => {
     res.type("application/json");
 
