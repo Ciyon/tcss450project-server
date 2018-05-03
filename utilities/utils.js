@@ -3,18 +3,65 @@ let db = require('./sql_conn.js');
 //We use this create the SHA256 hash
 const crypto = require("crypto");
 const FormData = require("form-data");
-function sendEmail(from, to, subject, message) {
-    let form = new FormData();
-    form.append("from", from);
-    form.append("to", to);
-    form.append("subject", subject);
-    form.append("message", message);
-    form.submit("http://cssgate.insttech.washington.edu/~cfb3/mail.php", (err,
-        res) => {
-        if (err) console.error(err);
-        console.log(res);
+var nodemailer = require('nodemailer');
+/** 
+ * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
+ */
+
+// function encrypt(text, key){
+//   var cipher = crypto.createCipher('aes-256-cbc',key)
+//   var crypted = cipher.update(text,'utf8','hex')
+//   crypted += cipher.final('hex');
+//   return crypted;
+// }
+
+function decrypt(text, key){
+    var decipher = crypto.createDecipher('aes-256-cbc',key)
+    var dec = decipher.update(text,'hex','utf8')
+    dec += decipher.final('utf8');
+    return dec;
+}
+
+/** 
+ * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
+ * @author Brandon Gaetaniello
+ * @param {*} sending is the email address sending the email
+ * @param {*} receiving is the email address receiving the email
+ * @param {*} subject is the subject of the email
+ * @param {*} message is the body of the email
+ */
+function sendEmail(sending, receiving, subject, message)
+{
+    db.one('SELECT Encrypted, Email, Key FROM GMAIL')
+    .then(row => {
+        let key = row['key'];
+        let password = decrypt(row['encrypted'], key);
+        let email = row['email'];
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: email,
+              pass: password
+            }
+          });
+    
+        var mailOptions = {
+            sending: email,
+            to: receiving,
+            subject: 'Test',
+            text: 'THIS IS A TEST'
+          };
+    
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
     });
 }
+
 /**
 * Method to get a salted hash.
 * We put this in its own method to keep consistency
