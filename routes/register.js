@@ -18,6 +18,7 @@ let getHash = require('../utilities/utils').getHash;
 let sendEmail = require('../utilities/utils').sendEmail;
 
 var router = express.Router();
+router.use(bodyParser.json());
 
 router.post('/', (req, res) => {
     res.type("application/json");
