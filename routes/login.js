@@ -21,17 +21,30 @@ router.post('/', (req, res) => {
     let wasSuccessful = false;
     if (user && theirPw) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Password, Salt FROM Members WHERE Username=$1', [user])
+        db.one('SELECT Password, Salt, Verification FROM Members WHERE Username=$1', [user])
             //If successful, run function passed into .then()
             .then(row => {
                 let salt = row['salt'];
                 let ourSaltedHash = row['password']; //Retrieve our copy of the password
+                let verify = row['verification'];
                 let theirSaltedHash = getHash(theirPw, salt); //Combined their password with our salt, then hash
                 let wasCorrectPw = ourSaltedHash === theirSaltedHash; //Did our salted hash match their salted hash?
                 //Send whether they had the correct password or not
-                res.send({
-                    success: wasCorrectPw
-                });
+                if (!verify)
+                {
+                    res.send({
+                        success : false,
+                        message: "User hasn't confirmed email"
+                    })
+                }
+                else
+                {
+                    db.none("UPDATE MEMBERS SET Confirm = '', Expire = '' WHERE Verification = 1")
+                    res.send({
+                        success: wasCorrectPw
+                    });
+                }
+                
             })
             //More than one row shouldn't be found, since table has constraint on it
             .catch((err) => {

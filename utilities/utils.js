@@ -8,12 +8,12 @@ var nodemailer = require('nodemailer');
  * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
 
-// function encrypt(text, key){
-//   var cipher = crypto.createCipher('aes-256-cbc',key)
-//   var crypted = cipher.update(text,'utf8','hex')
-//   crypted += cipher.final('hex');
-//   return crypted;
-// }
+function encrypt(text, key){
+  var cipher = crypto.createCipher('aes-256-cbc',key)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted.substring(0, 20);
+}
 
 function decrypt(text, key){
     var decipher = crypto.createDecipher('aes-256-cbc',key)
@@ -25,14 +25,11 @@ function decrypt(text, key){
 /** 
  * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
  * @author Brandon Gaetaniello
- * @param {*} sending is the email address sending the email
  * @param {*} receiving is the email address receiving the email
- * @param {*} subject is the subject of the email
- * @param {*} message is the body of the email
  */
-function sendEmail(sending, receiving, subject, message)
+function sendVerificationEmail(receiving, url)
 {
-    db.one('SELECT Encrypted, Email, Key FROM GMAIL')
+    db.one("SELECT Encrypted, Email, Key FROM GMAIL")
     .then(row => {
         let key = row['key'];
         let password = decrypt(row['encrypted'], key);
@@ -48,8 +45,8 @@ function sendEmail(sending, receiving, subject, message)
         var mailOptions = {
             sending: email,
             to: receiving,
-            subject: 'Test',
-            text: 'THIS IS A TEST'
+            subject: "Email Confirmation",
+            text: "Please click the following link to confirm your email: " + url
           };
     
           transporter.sendMail(mailOptions, function(error, info){
@@ -71,6 +68,19 @@ function sendEmail(sending, receiving, subject, message)
 function getHash(pw, salt) {
     return crypto.createHash("sha256").update(pw + salt).digest("hex");
 }
+
+function getCode() {
+  var letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  var confirm;
+  var i;
+  var inDatabase = false;
+  confirm = "";
+  for (i = 0; i < 20; i++)
+  {
+    confirm += letters.charAt(Math.random() * letters.length - 1);
+  }
+  return confirm;
+}
 module.exports = {
-    db, getHash, sendEmail
+    db, getHash, sendVerificationEmail, getCode
 };

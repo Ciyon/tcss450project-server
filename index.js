@@ -15,6 +15,8 @@ var login = require('./routes/login.js');
 app.use('/login', login);
 var reg = require('./routes/register.js');
 app.use('/register', reg);
+var verify = require('./routes/verify.js');
+app.use('/verify', verify);
 
 
 /*
