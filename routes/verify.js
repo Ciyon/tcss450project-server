@@ -3,15 +3,35 @@ const express = require('express');
 var router = express.Router();
 
 router.get("/", (req, res) => {
-    res.send({
-        //req.query is a reference to arguments in the url
-        message: "Account has been confirmed with confirmation code " + req.query['confirm'] + ".",
-        
-    });
-    var query = "UPDATE MEMBERS SET VERIFICATION = 1 WHERE CONFIRM = '" + req.query['confirm'] + "'";
+    if (req.url.includes("?confirm=")) {
+        console.log("Confirm: " + req.query['confirm']);
+        db.result("SELECT 1 FROM MEMBERS WHERE CONFIRM= '" + req.query['confirm'] + "'")
+            .then(result => {
+                console.log("RESULT", result);
+                if (result.rowCount == 0) {
+                    res.send({
+                        message: "Confirmation code doesn't match to any account."
+                    })
+                }
+                else if (result.rowCount == 1) {
+                        res.send({
+                            message: "Account has been confirmed."
+                        })
+                }
 
-    db.result(query)
-    db.none("UPDATE MEMBERS SET Confirm = NULL, Expire = NULL WHERE Verification = 1")
+            })
+            .catch(error => {
+                console.log("ERROR", error);
+            })
+        db.result("UPDATE MEMBERS SET VERIFICATION = 1 WHERE CONFIRM = '" + req.query['confirm'] + "'")
+        db.none("UPDATE MEMBERS SET CONFIRM = NULL, EXPIRE = NULL WHERE Verification = 1")
+    }
+    else {
+        res.send({
+            message: "Invalid URL."
+        })
+    }
+
 });
 
 module.exports = router;

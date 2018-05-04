@@ -26,10 +26,10 @@ router.post('/', (req, res) => {
     res.type("application/json");
 
     //Retrieve data from query params
-    var first = req.body['first'];
-    var last = req.body['last'];
-    var username = req.body['username'];
-    var email = req.body['email'];
+    var first = req.body['first'].toLowerCase();
+    var last = req.body['last'].toLowerCase();
+    var username = req.body['username'].toLowerCase();
+    var email = req.body['email'].toLowerCase();
     var password = req.body['password'];
     var expire = new Date();
     var confirm = getCode().toString(); 
@@ -52,6 +52,7 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
+                //var URL = "localhost:5000/verify?confirm=" + confirm
                 var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
                 sendVerificationEmail(email, URL);
             }).catch((err) => {
