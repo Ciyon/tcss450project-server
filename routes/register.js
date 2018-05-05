@@ -1,11 +1,7 @@
 //express is the framework we're going to use to handle requests
 const express = require('express');
-//Create a new instance of express
-const app = express();
 
 const bodyParser = require("body-parser");
-//This allows parsing of the body of POST requests, that are encoded in JSON
-app.use(bodyParser.json());
 
 //We use this create the SHA256 hash
 const crypto = require("crypto");
@@ -52,8 +48,8 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                //var URL = "localhost:5000/verify?confirm=" + confirm
-                var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
+                var URL = "localhost:5000/verify?confirm=" + confirm
+                //var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
                 sendVerificationEmail(email, URL);
             }).catch((err) => {
                 //log the error
@@ -62,7 +58,7 @@ router.post('/', (req, res) => {
                 //Therefore, let the requester know they tried to create an account that already exists
                 res.send({
                     success: false,
-                    error: err
+                    error: "Account or Email already exists."
                 });
             });
     } else {

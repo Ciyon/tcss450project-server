@@ -17,6 +17,8 @@ var reg = require('./routes/register.js');
 app.use('/register', reg);
 var verify = require('./routes/verify.js');
 app.use('/verify', verify);
+var resend = require('./routes/resend.js');
+app.use('/resend', resend);
 
 
 /*

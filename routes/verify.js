@@ -4,7 +4,6 @@ var router = express.Router();
 
 router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
-        console.log("Confirm: " + req.query['confirm']);
         db.result("SELECT * FROM MEMBERS WHERE CONFIRM= '" + req.query['confirm'] + "'")
             .then(result => {
                 //console.log("RESULT", result.rows);
