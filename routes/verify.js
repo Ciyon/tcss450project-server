@@ -5,18 +5,31 @@ var router = express.Router();
 router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
         console.log("Confirm: " + req.query['confirm']);
-        db.result("SELECT 1 FROM MEMBERS WHERE CONFIRM= '" + req.query['confirm'] + "'")
+        db.result("SELECT * FROM MEMBERS WHERE CONFIRM= '" + req.query['confirm'] + "'")
             .then(result => {
-                console.log("RESULT", result);
+                //console.log("RESULT", result.rows);
                 if (result.rowCount == 0) {
                     res.send({
                         message: "Confirmation code doesn't match to any account."
                     })
                 }
                 else if (result.rowCount == 1) {
-                        res.send({
-                            message: "Account has been confirmed."
-                        })
+                        var today = new Date();
+                        var expire = result.rows[0]["expire"];
+                        if (expire >= today)
+                        {
+                            res.send({
+                                message: "Account has been confirmed."
+                            })
+                        }
+
+                        else
+                        {
+                            res.send({
+                                message: "Link has expired. You can resend a new email on the login screen."
+                            })
+                        }
+                            
                 }
 
             })

@@ -29,6 +29,7 @@ function decrypt(text, key){
  */
 function sendVerificationEmail(receiving, url)
 {
+  console.log("URL: " + url);
     db.one("SELECT Encrypted, Email, Key FROM GMAIL")
     .then(row => {
         let key = row['key'];
