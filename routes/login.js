@@ -37,6 +37,12 @@ router.post('/', (req, res) => {
                         message: "User hasn't confirmed email"
                     })
                 }
+                else
+                {
+                    res.send({
+                        success : true
+                    })
+                }
                 
             })
             //More than one row shouldn't be found, since table has constraint on it
