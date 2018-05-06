@@ -24,8 +24,6 @@ function decrypt(text, key){
 
 /** 
  * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
- * @author Brandon Gaetaniello
- * @param {*} receiving is the email address receiving the email
  */
 function sendVerificationEmail(receiving, url)
 {
@@ -54,7 +52,7 @@ function sendVerificationEmail(receiving, url)
             if (error) {
               console.log(error);
             } else {
-              console.log('Email sent: ' + info.response);
+              console.log('Email sent.');
             }
           });
     });

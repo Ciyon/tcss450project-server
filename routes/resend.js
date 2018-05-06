@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
     res.type("application/json");
     var email = req.body['email'].toLowerCase();
     if (email && email.includes("@")) {
-        db.result("SELECT * FROM MEMBERS WHERE EMAIL = '" + email + "'")
+        db.result("SELECT * FROM MEMBERS WHERE EMAIL = $1", [email])
             .then(result => {
                 if (result.rowCount == 0) {
                     res.send({

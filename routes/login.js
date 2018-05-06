@@ -37,13 +37,6 @@ router.post('/', (req, res) => {
                         message: "User hasn't confirmed email"
                     })
                 }
-                else
-                {
-                    db.none("UPDATE MEMBERS SET Confirm = '', Expire = '' WHERE Verification = 1")
-                    res.send({
-                        success: wasCorrectPw
-                    });
-                }
                 
             })
             //More than one row shouldn't be found, since table has constraint on it

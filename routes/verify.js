@@ -4,7 +4,7 @@ var router = express.Router();
 
 router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
-        db.result("SELECT * FROM MEMBERS WHERE CONFIRM= '" + req.query['confirm'] + "'")
+        db.result("SELECT * FROM MEMBERS WHERE CONFIRM= $1", [req.query['confirm']])
             .then(result => {
                 //console.log("RESULT", result.rows);
                 if (result.rowCount == 0) {
@@ -35,8 +35,7 @@ router.get("/", (req, res) => {
             .catch(error => {
                 console.log("ERROR", error);
             })
-        db.result("UPDATE MEMBERS SET VERIFICATION = 1 WHERE CONFIRM = '" + req.query['confirm'] + "'")
-        db.none("UPDATE MEMBERS SET CONFIRM = NULL, EXPIRE = NULL WHERE Verification = 1")
+        db.result("UPDATE MEMBERS SET VERIFICATION = 1, CONFIRM = NULL, EXPIRE = NULL WHERE CONFIRM = $1", [req.query['confirm']])
     }
     else {
         res.send({
