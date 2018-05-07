@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
             res.send({
                 success:false,
                 error: "Password must be atleast 5 characters long"
-            })
+            });
         }
 
         //Use .none() since no result gets returned from an INSERT in SQL
