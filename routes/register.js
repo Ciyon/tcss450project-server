@@ -39,6 +39,13 @@ router.post('/', (req, res) => {
         let salt = crypto.randomBytes(32).toString("hex");
         let salted_hash = getHash(password, salt);
 
+        if(password.length < 5) {
+            res.send({
+                success:false,
+                error: "Password must be atleast 5 characters long"
+            })
+        }
+
         //Use .none() since no result gets returned from an INSERT in SQL
         //We're using placeholders ($1, $2, $3) in the SQL query string to avoid SQL Injection
         //If you want to read more: https://stackoverflow.com/a/8265319
@@ -58,7 +65,7 @@ router.post('/', (req, res) => {
                 //Therefore, let the requester know they tried to create an account that already exists
                 res.send({
                     success: false,
-                    error: "Account or Email already exists."
+                    error: "Username or Email already exists."
                 });
             });
     } else {
