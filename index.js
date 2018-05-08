@@ -19,6 +19,8 @@ var verify = require('./routes/verify.js');
 app.use('/verify', verify);
 var resend = require('./routes/resend.js');
 app.use('/resend', resend);
+var msg = require('./routes/messages.js'); 
+app.use('/', msg);
 
 
 /*
