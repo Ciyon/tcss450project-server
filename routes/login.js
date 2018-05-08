@@ -37,11 +37,22 @@ router.post('/', (req, res) => {
                         message: "User hasn't confirmed email"
                     })
                 }
-                else if (wasCorrectPw)
+                else
                 {
-                    res.send({
-                        success : true
-                    })
+                    if (wasCorrectPw)
+                    {
+                        res.send({
+                            success : true
+                        })
+                    }
+                    else
+                    {
+                        res.send({
+                            success : false,
+                            message: "Incorrect password"
+                        })
+                    }
+                    
                 }
                 
             })
