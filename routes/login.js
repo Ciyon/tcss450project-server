@@ -62,7 +62,7 @@ router.post('/', (req, res) => {
                 //If anything happened, it wasn't successful
                 res.send({
                     success: false,
-                    error: err
+                    error: "Username not found."
                 });
             });
     } else {
