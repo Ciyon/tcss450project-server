@@ -37,7 +37,7 @@ router.post('/', (req, res) => {
                         message: "User hasn't confirmed email"
                     })
                 }
-                else
+                else if (wasCorrectPw)
                 {
                     res.send({
                         success : true
@@ -56,7 +56,7 @@ router.post('/', (req, res) => {
     } else {
         res.send({
             success: false,
-            message: 'missing credentials'
+            message: 'Missing credentials'
         });
     }
 });
