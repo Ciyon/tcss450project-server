@@ -42,7 +42,7 @@ router.post('/', (req, res) => {
         if(password.length < 5) {
             res.send({
                 success:false,
-                error: "Password must be atleast 5 characters long"
+                error: "Password must be at least 5 characters long"
             });
         }
 

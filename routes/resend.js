@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
                 if (result.rowCount == 0) {
                     res.send({
                         success: false,
-                        message: "Email doesn't belong to any account registered."
+                        error: "Email doesn't belong to any account registered."
                     })
                 }
                 else if (result.rowCount == 1) {
@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
                     else {
                         res.send({
                             success: false,
-                            message: "Email already verified."
+                            error: "Email already verified."
                         })
                     }
 
@@ -56,7 +56,6 @@ router.post('/', (req, res) => {
     else {
         res.send({
             success: false,
-            input: req.body,
             error: "Missing required user information"
         });
     }
