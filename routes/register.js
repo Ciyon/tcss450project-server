@@ -39,9 +39,9 @@ router.post('/', (req, res) => {
         let salt = crypto.randomBytes(32).toString("hex");
         let salted_hash = getHash(password, salt);
 
-        if(password.length < 5) {
+        if(password.length < 5 || password.length < 0) {
             res.send({
-                success:false,
+                success: false,
                 error: "Password must be at least 5 characters long"
             });
         }
