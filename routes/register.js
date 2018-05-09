@@ -13,8 +13,6 @@ let getHash = require('../utilities/utils').getHash;
 
 let sendVerificationEmail = require('../utilities/utils').sendVerificationEmail;
 
-let getCode = require('../utilities/utils').getCode;
-
 var router = express.Router();
 router.use(bodyParser.json());
 
@@ -28,7 +26,7 @@ router.post('/', (req, res) => {
     var email = req.body['email'].toLowerCase();
     var password = req.body['password'];
     var expire = new Date();
-    var confirm = getCode().toString(); 
+    var confirm = crypto.randomBytes(20).toString("hex");
     expire.setHours(expire.getHours() + 24);
     //Verify that the caller supplied all the parameters
     //In js, empty strings or null values evaluate to false
@@ -55,8 +53,8 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                //var URL = "localhost:5000/verify?confirm=" + confirm
-                var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
+                var URL = "localhost:5000/verify?confirm=" + confirm
+                //var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
                 sendVerificationEmail(email, URL);
             }).catch((err) => {
                 //log the error

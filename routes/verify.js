@@ -6,7 +6,6 @@ router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
         db.result("SELECT * FROM MEMBERS WHERE CONFIRM= $1", [req.query['confirm']])
             .then(result => {
-                //console.log("RESULT", result.rows);
                 if (result.rowCount == 0) {
                     res.send({
                         message: "Confirmation code doesn't match to any account."

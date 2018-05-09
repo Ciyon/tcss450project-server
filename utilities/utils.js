@@ -68,18 +68,6 @@ function getHash(pw, salt) {
     return crypto.createHash("sha256").update(pw + salt).digest("hex");
 }
 
-function getCode() {
-  var letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  var confirm;
-  var i;
-  var inDatabase = false;
-  confirm = "";
-  for (i = 0; i < 20; i++)
-  {
-    confirm += letters.charAt(Math.random() * letters.length - 1);
-  }
-  return confirm;
-}
 module.exports = {
-    db, getHash, sendVerificationEmail, getCode
+    db, getHash, sendVerificationEmail
 };
