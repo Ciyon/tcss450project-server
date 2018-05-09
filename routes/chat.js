@@ -7,16 +7,19 @@ let db = require('../utilities/utils').db;
 var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
+
+// /createChat creates a new chat session / inserts it into the Chats table
 router.post("/createChat", (req, res) => {
-    let username = req.body['username'];
-    if (!username) {
-        res.send({ success: false, error: "Username not supplied" });
+    // TODO: determine what name should be?
+    let name = req.body['name'];
+    if (!name) {
+        res.send({ success: false, error: "name not supplied" });
         return;
     }
     let insert = `INSERT INTO Chats(Name)                   
                   SELECT $1`
     
-    db.none(insert, [username])
+    db.none(insert, [name])
         .then(() => { res.send({ success: true }); })
         .catch((err) => {
             res.send({
@@ -25,14 +28,35 @@ router.post("/createChat", (req, res) => {
         });
 });
 
-//TODO: Determine if we need a get for chats, and what it should return
-/*
-router.get("/getChat", (req, res) => {
-    let chatId = req.query['chatId']; 
-    let query = `SELECT ChatId, Name,                                  
-    FROM Chats                 
-    WHERE ChatId=$1`
-    db.one(query, [after, chatId]).then((rows) => {
+// /joinChat inserts a tuple into ChatMembers
+router.post("/joinChat", (req, res) => {
+    let username = req.body['username'];
+    let chatId = req.body['chatId']
+    if (!username) {
+        res.send({ success: false, error: "Username or chatId not supplied" });
+        return;
+    }
+    // Do we need to check if they are already in the chat?
+    let insert = `INSERT INTO ChatMembers(ChatId, MemberId)                   
+                  SELECT $1, MemberId FROM Members                   
+                  WHERE Username=$2`
+    
+    db.none(insert, [chatId, username])
+        .then(() => { res.send({ success: true }); })
+        .catch((err) => {
+            res.send({
+                success: false, error: err,
+            });
+        });
+});
+
+// Get the chatIds of chats sessions a user is part of
+router.get("/getChatId", (req, res) => {
+    let username = req.query['username']; 
+    let query = `SELECT ChatId                                  
+                FROM ChatMembers                 
+                WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
+    db.manyOrNone(query, [username]).then((rows) => {
         res.send({ messages: rows })
     }).catch((err) => {
         res.send({
@@ -40,5 +64,5 @@ router.get("/getChat", (req, res) => {
         })
     });
 });
-*/
+
 module.exports = router; 
