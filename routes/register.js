@@ -53,8 +53,8 @@ router.post('/', (req, res) => {
                 res.send({
                     success: true
                 });
-                var URL = "localhost:5000/verify?confirm=" + confirm
-                //var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
+                //var URL = "localhost:5000/verify?confirm=" + confirm
+                var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
                 sendVerificationEmail(email, URL);
             }).catch((err) => {
                 //log the error
