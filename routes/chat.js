@@ -16,7 +16,7 @@ router.post("/createChat", (req, res) => {
         res.send({ success: false, error: "name not supplied" });
         return;
     }
-    let insert = `INSERT INTO Chats(MemberId) Values($1)`
+    let insert = `INSERT INTO Chats(MemberId) VALUES ($1)`
     
     db.none(insert, [memberid])
         .then(() => { res.send({ success: true }); })
