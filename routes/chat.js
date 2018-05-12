@@ -11,12 +11,12 @@ router.use(bodyParser.json());
 // /createChat creates a new chat session / inserts it into the Chats table
 router.post("/createChat", (req, res) => {
     // TODO: determine what name should be?
-    let name = req.body['name'];
+    let name = req.body['memberid'];
     if (!name) {
         res.send({ success: false, error: "name not supplied" });
         return;
     }
-    let insert = `INSERT INTO Chats(Name)                   
+    let insert = `INSERT INTO Chats(MemberId)                   
                   SELECT $1`
     
     db.none(insert, [name])
