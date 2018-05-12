@@ -16,7 +16,7 @@ router.post("/createChat", (req, res) => {
         res.send({ success: false, error: "name not supplied" });
         return;
     }
-    let insert = `INSERT INTO Chats(MemberId) VALUES ($1)`
+    let insert = "INSERT INTO Chats(MemberId) VALUES ($1)";
     
     db.none(insert, [memberid])
         .then(() => { res.send({ success: true }); })
@@ -56,7 +56,7 @@ router.get("/getChatId", (req, res) => {
                 FROM ChatMembers                 
                 WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
     db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ messages: rows })
+        res.send({ chats: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
