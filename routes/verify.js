@@ -7,25 +7,25 @@ router.get("/", (req, res) => {
         db.result("SELECT * FROM MEMBERS WHERE CONFIRM= $1", [req.query['confirm']])
             .then(result => {
                 if (result.rowCount == 0) {
-                    res.send({
-                        message: "Confirmation code doesn't match to any account."
-                    })
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write("<h1>Confirmation code doesn't match to any account.</h1>")
+                    res.end();
                 }
                 else if (result.rowCount == 1) {
                         var today = new Date();
                         var expire = result.rows[0]["expire"];
                         if (expire >= today)
                         {
-                            res.send({
-                                message: "Account has been confirmed."
-                            })
+                            res.writeHead(200, {'Content-Type': 'text/html'});
+                            res.write("<h1>Account has been confirmed.</h1>")
+                            res.end();
                         }
 
                         else
                         {
-                            res.send({
-                                message: "Link has expired. You can resend a new email on the login screen."
-                            })
+                            res.writeHead(200, {'Content-Type': 'text/html'});
+                            res.write("<h1>Link has expired.</h1>")
+                            res.end();
                         }
                             
                 }
@@ -34,12 +34,12 @@ router.get("/", (req, res) => {
             .catch(error => {
                 console.log("ERROR", error);
             })
-        db.result("UPDATE MEMBERS SET VERIFICATION = 1, CONFIRM = NULL, EXPIRE = NULL WHERE CONFIRM = $1", [req.query['confirm']])
+        db.none("UPDATE MEMBERS SET VERIFICATION = 1, CONFIRM = NULL, EXPIRE = NULL WHERE CONFIRM = $1", [req.query['confirm']])
     }
     else {
-        res.send({
-            message: "Invalid URL."
-        })
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write("<h1>Invalid URL.</h1>")
+        res.end();
     }
 
 });

@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
                 {
                     res.send({
                         success : false,
-                        error: "User hasn't confirmed email"
+                        error: "User hasn't confirmed email."
                     })
                 }
                 else
@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
                     {
                         res.send({
                             success : false,
-                            error: "Incorrect password"
+                            error: "Incorrect password."
                         })
                     }
                     
@@ -68,7 +68,7 @@ router.post('/', (req, res) => {
     } else {
         res.send({
             success: false,
-            error: 'Missing credentials'
+            error: 'Missing credentials.'
         });
     }
 });
