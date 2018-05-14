@@ -44,7 +44,7 @@ function sendEmail(receiving, subject, message)
         var mailOptions = {
             sending: email,
             to: receiving,
-            subject: "Email Confirmation",
+            subject: subject,
             text: message 
           };
     
