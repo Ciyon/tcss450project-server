@@ -39,7 +39,6 @@ router.post('/', (req, res) => {
                             var confirm = crypto.randomBytes(20).toString("hex");
                             expire.setDate(expire.getDate() + 1);
                             db.none("UPDATE MEMBERS SET CONFIRM = $1, EXPIRE = $2 WHERE EMAIL = $3", [confirm, expire, email])
-                            //var message = "Please click the following link to confirm your email: localhost:5000/verify?confirm=" + confirm
                             var message = "Please click the following link within 24 hours to confirm your email: tcss450group4.herokuapp.com/verify?confirm=" + confirm
                             sendEmail(email, "Email Confirmation", message);
                             res.send({

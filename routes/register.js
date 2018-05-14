@@ -60,7 +60,6 @@ router.post('/', (req, res) => {
                         res.send({
                             success: true
                         });
-                        //var message = "Please click the following link to confirm your email: localhost:5000/verify?confirm=" + confirm
                         var message = "Please click the following link to confirm your email: tcss450group4.herokuapp.com/verify?confirm=" + confirm
                         sendEmail(email, "Email Confirmation", message);
                     }).catch((err) => {
