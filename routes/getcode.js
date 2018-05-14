@@ -6,9 +6,9 @@ const crypto = require("crypto");
 //Create connection to Heroku Database
 let db = require('../utilities/utils').db;
 
-const bodyParser = require("body-parser");
-
 let sendEmail = require('../utilities/utils').sendEmail;
+
+const bodyParser = require("body-parser");
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -22,9 +22,10 @@ router.post('/', (req, res) => {
                 success: false,
                 error: "Email is invalid."
             })
+
         }
         else {
-            db.result("SELECT * FROM MEMBERS WHERE EMAIL = $1", [email])
+            db.result("SELECT * FROM MEMBERS WHERE EMAIL= $1", [email])
                 .then(result => {
                     if (result.rowCount == 0) {
                         res.send({
@@ -35,39 +36,34 @@ router.post('/', (req, res) => {
                     else if (result.rowCount == 1) {
                         var verify = result.rows[0]["verification"];
                         if (!verify) {
+                            res.send({
+                                success: false,
+                                error: "Email must be confirmed in order to reset password."
+                            })
+                        }
+                        else
+                        {
+                            var code = crypto.randomBytes(3).toString("hex");
                             var expire = new Date();
-                            var confirm = crypto.randomBytes(20).toString("hex");
                             expire.setDate(expire.getDate() + 1);
-                            db.none("UPDATE MEMBERS SET CONFIRM = $1, EXPIRE = $2 WHERE EMAIL = $3", [confirm, expire, email])
-                            //var message = "Please click the following link to confirm your email: localhost:5000/verify?confirm=" + confirm
-                            var message = "Please click the following link within 24 hours to confirm your email: tcss450group4.herokuapp.com/verify?confirm=" + confirm
-                            sendEmail(email, "Email Confirmation", message);
+                            db.none("UPDATE MEMBERS SET RESETCODE = $1, EXPIRE = $2 WHERE EMAIL = $3", [code, expire, email])
+                            var message = "Please enter this code in the app within 24 hours to reset your password:\n" + code
+                            sendEmail(email, "Code for Password Reset", message);
                             res.send({
                                 success: true,
                                 message: "Email sent."
                             })
                         }
-                        else {
-                            res.send({
-                                success: false,
-                                error: "Email already verified."
-                            })
-                        }
-
                     }
                 })
-                .catch(error => {
-                    console.log("ERROR", error);
-                })
         }
-    }
-    else {
+    } else {
         res.send({
             success: false,
+            input: req.body,
             error: "Missing required user information."
         });
     }
-
-});
+})
 
 module.exports = router;

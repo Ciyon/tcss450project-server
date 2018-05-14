@@ -25,9 +25,9 @@ function decrypt(text, key){
 /** 
  * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
  */
-function sendVerificationEmail(receiving, url)
+function sendEmail(receiving, subject, message)
 {
-  console.log("URL: " + url);
+  console.log("Message: " + message);
     db.one("SELECT Encrypted, Email, Key FROM GMAIL")
     .then(row => {
         let key = row['key'];
@@ -45,7 +45,7 @@ function sendVerificationEmail(receiving, url)
             sending: email,
             to: receiving,
             subject: "Email Confirmation",
-            text: "Please click the following link to confirm your email: " + url
+            text: message 
           };
     
           transporter.sendMail(mailOptions, function(error, info){
@@ -69,5 +69,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    db, getHash, sendVerificationEmail
+    db, getHash, sendEmail
 };

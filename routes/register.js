@@ -11,7 +11,7 @@ let db = require('../utilities/utils').db;
 
 let getHash = require('../utilities/utils').getHash;
 
-let sendVerificationEmail = require('../utilities/utils').sendVerificationEmail;
+let sendEmail = require('../utilities/utils').sendEmail;
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -60,9 +60,9 @@ router.post('/', (req, res) => {
                         res.send({
                             success: true
                         });
-                        //var URL = "localhost:5000/verify?confirm=" + confirm
-                        var URL = "tcss450group4.herokuapp.com/verify?confirm=" + confirm
-                        sendVerificationEmail(email, URL);
+                        //var message = "Please click the following link to confirm your email: localhost:5000/verify?confirm=" + confirm
+                        var message = "Please click the following link to confirm your email: tcss450group4.herokuapp.com/verify?confirm=" + confirm
+                        sendEmail(email, "Email Confirmation", message);
                     }).catch((err) => {
                         //log the error
                         console.log(err);

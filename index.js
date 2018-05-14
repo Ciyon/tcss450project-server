@@ -23,6 +23,10 @@ var msg = require('./routes/messages.js');
 app.use('/', msg);
 var chat = require('./routes/chat.js'); 
 app.use('/', chat);
+var getCode = require('./routes/getcode.js'); 
+app.use('/getCode', getCode);
+var submitCode = require('./routes/submitcode.js'); 
+app.use('/submitCode', submitCode);
 // TODO: create endpoint for creating a new chat
 
 /*

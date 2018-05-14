@@ -2,6 +2,9 @@
 const express = require('express');
 var router = express.Router();
 
+//Create connection to Heroku Database
+let db = require('../utilities/utils').db;
+
 router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
         db.result("SELECT * FROM MEMBERS WHERE CONFIRM= $1", [req.query['confirm']])
