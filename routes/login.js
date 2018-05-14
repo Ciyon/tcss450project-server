@@ -14,7 +14,6 @@ let getHash = require('../utilities/utils').getHash;
 var router = express.Router();
 router.use(bodyParser.json());
 
-//app.get('/users') means accept http 'GET' requests at path '/users'
 router.post('/', (req, res) => {
     res.type("application/json");
     let user = req.body['username'];

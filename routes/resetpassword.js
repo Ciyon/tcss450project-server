@@ -41,7 +41,7 @@ router.post('/', (req, res) => {
                         })
                     }
                     else {
-                        if (!code.equals(resetcode)) {
+                        if (code != resetcode) {
                             res.send({
                                 success: false,
                                 error: "Code does not match to email provided."
@@ -59,7 +59,9 @@ router.post('/', (req, res) => {
                             }
                             else {
                                 var params = [email, salted_hash, salt];
-                                db.none("UPDATE MEMBERS SET Password = $2, Salt = $3 WHERE EMAIL = $1", params)
+                                db.none(`UPDATE MEMBERS 
+                                        SET Password = $2, Salt = $3, ResetCode = NULL, Expire = NULL 
+                                        WHERE EMAIL = $1`, params)
                                     .then(() => {
                                         res.send({
                                             success: true
@@ -67,7 +69,6 @@ router.post('/', (req, res) => {
                                         var message = "Your password has been updated.";
                                         sendEmail(email, "Password Reset Confirmation", message);
                                     })
-
                             }
                         }
                     }
