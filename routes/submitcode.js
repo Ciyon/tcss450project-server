@@ -29,6 +29,7 @@ router.post('/', (req, res) => {
                             res.send({
                                 success: true
                             })
+                            db.none("UPDATE MEMBERS SET RESETCODE = NULL, EXPIRE = NULL WHERE EMAIL = $1", [email])
                         }
                         else
                         {
