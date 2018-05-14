@@ -20,7 +20,8 @@ router.post('/', (req, res) => {
     res.type("application/json");
     var email = req.body['email'].toLowerCase();
     var password = req.body['password'];
-    if (email && password) {
+    var code = req.body['code'];
+    if (email && password && code) {
         if (!email.includes("@")) {
             res.send({
                 success: false,
@@ -31,6 +32,7 @@ router.post('/', (req, res) => {
             db.result("SELECT * FROM MEMBERS WHERE EMAIL= $1", [email])
                 .then(result => {
                     var today = new Date();
+                    var resetcode = result.rows[0]["resetcode"];
                     var expire = result.rows[0]["expire"];
                     if (!expire >= today) {
                         res.send({
@@ -39,28 +41,37 @@ router.post('/', (req, res) => {
                         })
                     }
                     else {
-                        let salt = crypto.randomBytes(32).toString("hex");
-                        let salted_hash = getHash(password, salt);
-
-                        if (password.length < 5) {
+                        if (!code.equals(resetcode)) {
                             res.send({
                                 success: false,
-                                error: "Password must be at least 5 characters long."
-                            });
+                                error: "Code does not match to email provided."
+                            })
                         }
                         else {
-                            var params = [email, salted_hash, salt];
-                            db.none("UPDATE MEMBERS SET Password = $2, Salt = $3 WHERE EMAIL = $1", params)
-                                .then(() => {
-                                    res.send({
-                                        success: true
-                                    });
-                                    var message = "Your password has been updated.";
-                                    sendEmail(email, "Password Reset Confirmation", message);
-                                })
+                            let salt = crypto.randomBytes(32).toString("hex");
+                            let salted_hash = getHash(password, salt);
 
+                            if (password.length < 5) {
+                                res.send({
+                                    success: false,
+                                    error: "Password must be at least 5 characters long."
+                                });
+                            }
+                            else {
+                                var params = [email, salted_hash, salt];
+                                db.none("UPDATE MEMBERS SET Password = $2, Salt = $3 WHERE EMAIL = $1", params)
+                                    .then(() => {
+                                        res.send({
+                                            success: true
+                                        });
+                                        var message = "Your password has been updated.";
+                                        sendEmail(email, "Password Reset Confirmation", message);
+                                    })
+
+                            }
                         }
                     }
+
 
                 })
 
