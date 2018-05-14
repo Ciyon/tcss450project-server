@@ -48,6 +48,7 @@ router.post('/', (req, res) => {
                     var message = "Your password has been updated.";
                     sendEmail(email, "Password Reset Confirmation", message);
                 })
+                db.none("UPDATE MEMBERS SET RESETCODE = NULL EXPIRE = NULL WHERE EMAIL = $1", [email])
             }
 
         }
