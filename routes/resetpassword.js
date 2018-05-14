@@ -27,29 +27,43 @@ router.post('/', (req, res) => {
                 error: "Email is invalid."
             })
         }
-        else
-        {
-            let salt = crypto.randomBytes(32).toString("hex");
-            let salted_hash = getHash(password, salt);
+        else {
+            db.result("SELECT * FROM MEMBERS WHERE EMAIL= $1", [email])
+                .then(result => {
+                    var today = new Date();
+                    var expire = result.rows[0]["expire"];
+                    if (!expire >= today) {
+                        res.send({
+                            success: false,
+                            error: "Code expired."
+                        })
+                    }
+                    else {
+                        let salt = crypto.randomBytes(32).toString("hex");
+                        let salted_hash = getHash(password, salt);
 
-            if (password.length < 5) {
-                res.send({
-                    success: false,
-                    error: "Password must be at least 5 characters long."
-                });
-            }
-            else {
-                var params = [email, salted_hash, salt];
-                db.none("UPDATE MEMBERS SET Password = $2, Salt = $3 WHERE EMAIL = $1", params)
-                .then(() => {
-                    res.send({
-                        success: true
-                    });
-                    var message = "Your password has been updated.";
-                    sendEmail(email, "Password Reset Confirmation", message);
+                        if (password.length < 5) {
+                            res.send({
+                                success: false,
+                                error: "Password must be at least 5 characters long."
+                            });
+                        }
+                        else {
+                            var params = [email, salted_hash, salt];
+                            db.none("UPDATE MEMBERS SET Password = $2, Salt = $3 WHERE EMAIL = $1", params)
+                                .then(() => {
+                                    res.send({
+                                        success: true
+                                    });
+                                    var message = "Your password has been updated.";
+                                    sendEmail(email, "Password Reset Confirmation", message);
+                                })
+                            db.none("UPDATE MEMBERS SET RESETCODE = NULL, EXPIRE = NULL WHERE EMAIL = $1", [email])
+                        }
+                    }
+
                 })
-                db.none("UPDATE MEMBERS SET RESETCODE = NULL, EXPIRE = NULL WHERE EMAIL = $1", [email])
-            }
+
 
         }
     } else {
