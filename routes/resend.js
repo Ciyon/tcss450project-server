@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
         if (!email.includes("@")) {
             res.send({
                 success: false,
-                error: "Email is invalid."
+                error: "Email requires \"@\" character"
             })
         }
         else {
@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
                     if (result.rowCount == 0) {
                         res.send({
                             success: false,
-                            error: "Email doesn't belong to any account registered."
+                            error: "Email doesn't exist."
                         })
                     }
                     else if (result.rowCount == 1) {
