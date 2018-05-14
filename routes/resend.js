@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
         if (!email.includes("@")) {
             res.send({
                 success: false,
-                error: "Email requires \"@\" character"
+                error: "Email is invalid."
             })
         }
         else {
