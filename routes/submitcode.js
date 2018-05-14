@@ -22,6 +22,7 @@ router.post('/', (req, res) => {
                         })
                     }
                     else if (result.rowCount == 1) {
+                        var email = result.rows[0]["email"];
                         var today = new Date();
                         var expire = result.rows[0]["expire"];
                         if (expire >= today)
