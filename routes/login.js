@@ -16,7 +16,7 @@ router.use(bodyParser.json());
 
 router.post('/', (req, res) => {
     res.type("application/json");
-    let user = req.body['username'];
+    let user = req.body['username'].toLowerCase();
     let theirPw = req.body['password'];
     let wasSuccessful = false;
     if (user && theirPw) {
