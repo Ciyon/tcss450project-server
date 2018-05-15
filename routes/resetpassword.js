@@ -29,7 +29,8 @@ router.post('/', (req, res) => {
             })
         }
         else {
-            db.result("SELECT * FROM MEMBERS WHERE EMAIL= $1", [email])
+            db.result(`SELECT * FROM MEMBERS
+                       WHERE EMAIL= $1`, [email])
                 .then(result => {
                     var today = new Date();
                     var resetcode = result.rows[0]["resetcode"];

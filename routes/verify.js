@@ -7,7 +7,8 @@ let db = require('../utilities/utils').db;
 
 router.get("/", (req, res) => {
     if (req.url.includes("?confirm=")) {
-        db.result("SELECT * FROM MEMBERS WHERE CONFIRM= $1", [req.query['confirm']])
+        db.result(`SELECT * FROM MEMBERS
+                   WHERE CONFIRM= $1`, [req.query['confirm']])
             .then(result => {
                 if (result.rowCount == 0) {
                     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -37,7 +38,9 @@ router.get("/", (req, res) => {
             .catch(error => {
                 console.log("ERROR", error);
             })
-        db.none("UPDATE MEMBERS SET VERIFICATION = 1, CONFIRM = NULL, EXPIRE = NULL WHERE CONFIRM = $1", [req.query['confirm']])
+        db.none(`UPDATE MEMBERS 
+                SET VERIFICATION = 1, CONFIRM = NULL, EXPIRE = NULL 
+                WHERE CONFIRM = $1`, [req.query['confirm']])
     }
     else {
         res.writeHead(200, {'Content-Type': 'text/html'});

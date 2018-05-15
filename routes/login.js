@@ -21,7 +21,8 @@ router.post('/', (req, res) => {
     let wasSuccessful = false;
     if (user && theirPw) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Password, Salt, Verification FROM Members WHERE Username=$1', [user])
+        db.one(`SELECT Password, Salt, Verification FROM Members
+                WHERE Username=$1`, [user])
             //If successful, run function passed into .then()
             .then(row => {
                 let salt = row['salt'];

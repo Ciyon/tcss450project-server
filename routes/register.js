@@ -55,12 +55,14 @@ router.post('/', (req, res) => {
                 //We're using placeholders ($1, $2, $3) in the SQL query string to avoid SQL Injection
                 //If you want to read more: https://stackoverflow.com/a/8265319
                 var params = [first, last, username, email, salted_hash, salt, confirm, expire];
-                db.none("INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt, Confirm, Expire) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", params)
+                db.none(`INSERT INTO MEMBERS(FirstName, LastName, Username, Email, Password, Salt, Confirm, Expire) 
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, params)
                     .then(() => {
                         res.send({
                             success: true
                         });
-                        var message = "Please click the following link to confirm your email: tcss450group4.herokuapp.com/verify?confirm=" + confirm
+                        var message = `Please click the following link to confirm your email:
+                                       tcss450group4.herokuapp.com/verify?confirm=` + confirm
                         sendEmail(email, "Email Confirmation", message);
                     }).catch((err) => {
                         //log the error
