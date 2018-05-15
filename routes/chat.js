@@ -57,12 +57,13 @@ router.post("/joinChat", (req, res) => {
 // Get the chatIds of chats sessions a user is part of
 router.post("/getChatId", (req, res) => {
     let username = req.query['username']; 
+    
         let query = `SELECT ChatId                                  
                     FROM ChatMembers                 
                     WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
-    if(!username) {
-        res.send({success: false, error: "Username or chatId not supplied"});
-    }
+    // if(!username) {
+    //     res.send({success: false, error: "Username or chatId not supplied"});
+    // }
 
     db.manyOrNone(query, [username]).then((rows) => {
         res.send({ chats: rows })
