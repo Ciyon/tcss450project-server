@@ -7,7 +7,6 @@ var nodemailer = require('nodemailer');
 /** 
  * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
-
 function encrypt(text, key){
   var cipher = crypto.createCipher('aes-256-cbc',key)
   var crypted = cipher.update(text,'utf8','hex')

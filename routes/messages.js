@@ -29,7 +29,8 @@ router.post("/sendMessages", (req, res) => {
 });
 
 router.get("/getMessages", (req, res) => {
-    let chatId = req.query['chatId']; let after = req.query['after'];
+    let chatId = req.query['chatId']; 
+    let after = req.query['after'];
     let query = `SELECT Members.Username, Messages.Message,                   
     to_char(Messages.Timestamp AT TIME ZONE 'PDT', 'YYYY-MM-DD HH24:MI:SS.US' ) AS Timestamp                  
     FROM Messages                  
