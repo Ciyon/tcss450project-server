@@ -78,4 +78,20 @@ router.post("/acceptRequest", (req, res) => {
         });
 });
 
+
+router.get("/getChatWithContact", (req, res) => {
+    let username = req.query['username']; 
+    let contactname = req.query['contactname'];
+    let query = `SELECT ChatId
+    FROM ChatMembers
+    WHERE MemberId=$2 AND ChatId=Any(SELECT ChatId FROM ChatMembers WHERE MemberId=$1)`
+    db.manyOrNone(query, [username, contactname]).then((rows) => {
+        res.send({ messages: rows })
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
+});
+
 module.exports = router;
