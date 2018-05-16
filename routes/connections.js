@@ -29,3 +29,5 @@ router.post("/addConnection", (req, res) => {
             });
         });
 });
+
+module.exports = router;
