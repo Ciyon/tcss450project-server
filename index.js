@@ -21,8 +21,10 @@ var resend = require('./routes/resend.js');
 app.use('/resend', resend);
 var msg = require('./routes/messages.js'); 
 app.use('/', msg);
-var chat = require('./routes/chat.js'); 
+var chat = require('./routes/chats.js'); 
 app.use('/', chat);
+var connection = require('./routes/chats.js'); 
+app.use('/', connection);
 // TODO: create endpoint for creating a new chat
 
 /*

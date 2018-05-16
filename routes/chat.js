@@ -52,7 +52,7 @@ router.post("/joinChat", (req, res) => {
 });
 
 // Get the chatIds of chats sessions a user is part of
-router.get("/getChatId", (req, res) => {
+router.get("/getChats", (req, res) => {
     let username = req.query['username']; 
     let query = `SELECT ChatId                                  
                 FROM ChatMembers                 
