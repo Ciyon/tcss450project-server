@@ -27,7 +27,8 @@ var getCode = require('./routes/getcode.js');
 app.use('/getCode', getCode);
 var resetPassword = require('./routes/resetpassword.js'); 
 app.use('/resetPassword', resetPassword);
-// TODO: create endpoint for creating a new chat
+var connection = require('./routes/connections.js'); 
+app.use('/', connection);
 
 /*
  * Return HTML for the / end point. 
