@@ -20,7 +20,27 @@ router.post("/addConnection", (req, res) => {
     let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B, Verified)
                 SELECT MemberId FROM Members WHERE Username=$1,
                         MemberId FROM Members WHERE Username=$2`
-    
+
+    db.none(insert, [username, contactname])
+        .then(() => { res.send({ success: true }); })
+        .catch((err) => {
+            res.send({
+                success: false, error: err,
+            });
+        });
+});
+
+router.post("/removeConnection", (req, res) => {
+    let username = req.body['username']
+    let contactname = req.body['contactname'];
+    if (!username || !contactname) {
+        res.send({ success: false, error: "username or contactname not supplied" });
+        return;
+    }
+
+    let insert = `DELETE FROM Contacts
+                  WHERE MemberId_A = $1 AND MemberId_B = $2`
+
     db.none(insert, [username, contactname])
         .then(() => { res.send({ success: true }); })
         .catch((err) => {
