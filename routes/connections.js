@@ -64,8 +64,10 @@ router.post("/acceptRequest", (req, res) => {
 
     let insert = `UPDATE CONTACTS
                   SET Verified = 1
-                  WHERE MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
-                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $2)`
+                  WHERE (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
+                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $2))
+                  OR (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $2) 
+                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $1))`
 
     db.none(insert, [username, contactname])
         .then(() => { res.send({ success: true }); })
