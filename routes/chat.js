@@ -17,7 +17,7 @@ router.post("/createChat", (req, res) => {
         return;
     }
     let insert = `INSERT INTO Chats(MemberId)
-    SELECT MemberId FROM Members                   
+                  SELECT MemberId FROM Members                   
                   WHERE Username=$1`
     
     db.none(insert, [username])
@@ -28,6 +28,7 @@ router.post("/createChat", (req, res) => {
             });
         });
 });
+
 
 // /joinChat inserts a tuple into ChatMembers
 router.post("/joinChat", (req, res) => {
@@ -51,14 +52,21 @@ router.post("/joinChat", (req, res) => {
         });
 });
 
+
+
 // Get the chatIds of chats sessions a user is part of
-router.get("/getChats", (req, res) => {
-    let username = req.query['username']; 
+
+router.post("/getChatId", (req, res) => {
+    let username = req.body['username']; 
     let query = `SELECT ChatId                                  
-                FROM ChatMembers                 
-                WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
+                    FROM ChatMembers                 
+                    WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
+    // if(!username) {
+    //     res.send({success: false, error: "Username or chatId not supplied"});
+    // }
+
     db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ chats: rows })
+        res.send({ success:true, chats: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err

@@ -7,7 +7,6 @@ var nodemailer = require('nodemailer');
 /** 
  * encrypt/decrypt found from : http://lollyrock.com/articles/nodejs-encryption/
  */
-
 function encrypt(text, key){
   var cipher = crypto.createCipher('aes-256-cbc',key)
   var crypted = cipher.update(text,'utf8','hex')
@@ -25,9 +24,9 @@ function decrypt(text, key){
 /** 
  * Function to send emails. Derived from : https://www.w3schools.com/nodejs/nodejs_email.asp
  */
-function sendVerificationEmail(receiving, url)
+function sendEmail(receiving, subject, message)
 {
-  console.log("URL: " + url);
+  console.log("Message: " + message);
     db.one("SELECT Encrypted, Email, Key FROM GMAIL")
     .then(row => {
         let key = row['key'];
@@ -44,8 +43,8 @@ function sendVerificationEmail(receiving, url)
         var mailOptions = {
             sending: email,
             to: receiving,
-            subject: "Email Confirmation",
-            text: "Please click the following link to confirm your email: " + url
+            subject: subject,
+            text: message 
           };
     
           transporter.sendMail(mailOptions, function(error, info){
@@ -69,5 +68,5 @@ function getHash(pw, salt) {
 }
 
 module.exports = {
-    db, getHash, sendVerificationEmail
+    db, getHash, sendEmail
 };

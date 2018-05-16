@@ -14,15 +14,15 @@ let getHash = require('../utilities/utils').getHash;
 var router = express.Router();
 router.use(bodyParser.json());
 
-//app.get('/users') means accept http 'GET' requests at path '/users'
 router.post('/', (req, res) => {
     res.type("application/json");
-    let user = req.body['username'];
+    let user = req.body['username'].toLowerCase();
     let theirPw = req.body['password'];
     let wasSuccessful = false;
     if (user && theirPw) {
         //Using the 'one' method means that only one row should be returned
-        db.one('SELECT Password, Salt, Verification FROM Members WHERE Username=$1', [user])
+        db.one(`SELECT Password, Salt, Verification FROM Members
+                WHERE Username=$1`, [user])
             //If successful, run function passed into .then()
             .then(row => {
                 let salt = row['salt'];
@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
                 {
                     res.send({
                         success : false,
-                        error: "User hasn't confirmed email"
+                        error: "User hasn't confirmed email."
                     })
                 }
                 else
@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
                     {
                         res.send({
                             success : false,
-                            error: "Incorrect password"
+                            error: "Incorrect password."
                         })
                     }
                     
@@ -68,7 +68,7 @@ router.post('/', (req, res) => {
     } else {
         res.send({
             success: false,
-            error: 'Missing credentials'
+            error: 'Missing credentials.'
         });
     }
 });
