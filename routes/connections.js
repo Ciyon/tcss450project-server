@@ -18,8 +18,8 @@ router.post("/addConnection", (req, res) => {
         return;
     }
     let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B, Verified)
-                SELECT MemberId FROM Members WHERE Username=$1,
-                        MemberId FROM Members WHERE Username=$2`
+                SELECT MemberId FROM Members WHERE Username= $1,
+                        MemberId FROM Members WHERE Username= $2`
 
     db.none(insert, [username, contactname])
         .then(() => { res.send({ success: true }); })
@@ -39,8 +39,10 @@ router.post("/removeConnection", (req, res) => {
     }
 
     let insert = `DELETE FROM Contacts
-                  WHERE MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
-                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $2)`
+                  WHERE (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
+                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $2))
+                  OR (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $2) 
+                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $1))`
 
     db.none(insert, [username, contactname])
         .then(() => { res.send({ success: true }); })
