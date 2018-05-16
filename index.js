@@ -21,13 +21,13 @@ var resend = require('./routes/resend.js');
 app.use('/resend', resend);
 var msg = require('./routes/messages.js'); 
 app.use('/', msg);
-var chat = require('./routes/chats.js'); 
+var chat = require('./routes/chat.js'); 
 app.use('/', chat);
 var getCode = require('./routes/getcode.js'); 
 app.use('/getCode', getCode);
 var resetPassword = require('./routes/resetpassword.js'); 
 app.use('/resetPassword', resetPassword);
-var connection = require('./routes/chats.js'); 
+var connection = require('./routes/connections.js'); 
 app.use('/', connection);
 
 /*

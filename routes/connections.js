@@ -8,19 +8,20 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
-
+/* Insert a new connection given the requester's username and the
+   username of the contact to be added. Verified is initialized to 0. */
 router.post("/addConnection", (req, res) => {
-    // TODO: determine what name should be?
     let username = req.body['username'];
-    if (!username) {
-        res.send({ success: false, error: "name not supplied" });
+    let contactname = req.body['contactname'];
+    if (!username || !contactname) {
+        res.send({ success: false, error: "username or contactname not supplied" });
         return;
     }
-    let insert = `INSERT INTO Chats(MemberId)
-    SELECT MemberId FROM Members                   
-                  WHERE Username=$1`
+    let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B, Verified)
+                SELECT MemberId FROM Members WHERE Username=$1,
+                        MemberId FROM Members WHERE Username=$2, $3`
     
-    db.none(insert, [username])
+    db.none(insert, [username, contactname, 0])
         .then(() => { res.send({ success: true }); })
         .catch((err) => {
             res.send({
