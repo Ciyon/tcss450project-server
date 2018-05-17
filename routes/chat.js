@@ -78,20 +78,19 @@ router.post("/leaveChat", (req, res) => {
     let username = req.body['username']; 
     let chatId = req.body['chatId'];
     if(username && chatId) {
-        res.send({ success: true });
-        /*
-        let insert = `DELETE FROM ChatMembers(ChatId, MemberId)                   
-                         SELECT $1, MemberId FROM Members                   
-                         WHERE Username=$2`
+        
+        let del = `DELETE FROM ChatMembers
+                        WHERE ChatId = $1 AND MemberId = 
+                        SELECT (SELECT MemberId FROM Members WHERE Username=$2)`
 
-        db.none(insert, [chatId, username])
+        db.none(del, [chatId, username])
             .then(() => { res.send({ success: true }); })
             .catch((err) => {
                 res.send({
                     success: false, error: err,
+                })
             });
-        });
-        */
+        
     } else {
         if (!username) {
             res.send({ success: false, error: "Username not supplied" });
