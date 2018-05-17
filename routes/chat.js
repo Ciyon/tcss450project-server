@@ -81,7 +81,7 @@ router.post("/leaveChat", (req, res) => {
         
         let del = `DELETE FROM ChatMembers
                         WHERE ChatId = $1 AND MemberId = 
-                        SELECT (SELECT MemberId FROM Members WHERE Username=$2)`
+                        (SELECT MemberId FROM Members WHERE Username=$2)`
 
         db.none(del, [chatId, username])
             .then(() => { res.send({ success: true }); })
