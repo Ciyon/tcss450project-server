@@ -29,6 +29,8 @@ var resetPassword = require('./routes/resetpassword.js');
 app.use('/resetPassword', resetPassword);
 var connection = require('./routes/connections.js'); 
 app.use('/', connection);
+var request = require('./routes/requests.js'); 
+app.use('/', request);
 
 /*
  * Return HTML for the / end point. 

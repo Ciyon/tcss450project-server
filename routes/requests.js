@@ -11,10 +11,10 @@ router.use(bodyParser.json());
 router.get("/getSentRequests", (req, res) => {
     let username = req.query['username']; 
     let query = `SELECT Username
-    FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_A
-    WHERE Verified=0 AND MemberID_A=(SELECT MemberId FROM Contacts WHERE Username=$1)`
+    FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_B
+    WHERE Verified=0 AND MemberID_A=(SELECT MemberId FROM Members WHERE Username=$1)`
     db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ messages: rows })
+        res.send({ requests: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
@@ -25,10 +25,10 @@ router.get("/getSentRequests", (req, res) => {
 router.get("/getReceivedRequests", (req, res) => {
     let username = req.query['username']; 
     let query = `SELECT Username
-    FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_B
-    WHERE Verified=0 AND MemberID_B=(SELECT MemberId FROM Contacts WHERE Username=$1)`
+    FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_A
+    WHERE Verified=0 AND MemberID_B=(SELECT MemberId FROM Members WHERE Username=$1)`
     db.manyOrNone(query, [username, 0]).then((rows) => {
-        res.send({ messages: rows })
+        res.send({ requests: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
