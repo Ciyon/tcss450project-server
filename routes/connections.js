@@ -91,7 +91,27 @@ router.get("/getConnections", (req, res) => {
     });
 });
 
-
+// Get an existing row in Contacts between two given users if it exists. Returns
+// the verified status of the connection. Can be used to check if a request or contact
+// already exists.
+router.get("/getExistingConnectionStatus", (req,res) => {
+    let username = req.query['username'];
+    let contactname = req.query['contactname'];
+    let query = `SELECT Verified 
+    FROM Contacts 
+    WHERE (MemberId_A=(SELECT MemberId from Members WHERE Username=$1) 
+            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$2))
+            OR
+            (MemberId_A=(SELECT MemberId from Members WHERE Username=$2) 
+            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$1))`
+    db.manyOrNone(query, [username, contactname]).then((row) => {
+        res.send({ messages: row })
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
+});
 
 router.get("/getChatWithContact", (req, res) => {
     let username = req.query['username']; 
