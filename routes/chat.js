@@ -33,8 +33,8 @@ router.post("/createChat", (req, res) => {
 // /joinChat inserts a tuple into ChatMembers
 router.post("/joinChat", (req, res) => {
     let username = req.body['username'];
-    let chatId = req.body['chatId']
-    if (!username) {
+    let chatId = req.body['chatId'];
+    if (!username || !chatId) {
         res.send({ success: false, error: "Username or chatId not supplied" });
         return;
     }
@@ -74,4 +74,31 @@ router.post("/getChatId", (req, res) => {
     });
 });
 
+router.post("/leaveChat", (req, res) => {
+    let username = req.body['username']; 
+    let chatId = req.body['chatId'];
+    if(username && chatId) {
+        let insert = `DELETE FROM ChatMembers(ChatId, MemberId)                   
+                         SELECT $1, MemberId FROM Members                   
+                         WHERE Username=$2`
+
+        db.none(insert, [chatId, username])
+            .then(() => { res.send({ success: true }); })
+            .catch((err) => {
+                res.send({
+                    success: false, error: err,
+            });
+        });
+    } else {
+        if (!username) {
+            res.send({ success: false, error: "Username not supplied" });
+            return;
+        }
+        if (!chatId) {
+            res.send({ success: false, error: "chatId not supplied" });
+            return;
+        }
+    }
+    
+});
 module.exports = router; 
