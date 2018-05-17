@@ -78,13 +78,28 @@ router.post("/acceptRequest", (req, res) => {
         });
 });
 
+router.get("/getConnections", (req, res) => {
+    let username = req.query['username'];
+    let query = `SELECT Username
+    FROM Contacts
+        WHERE MemberId_A=$1 OR MemberId_B=$1`
+    db.manyOrNone(query, [username]).then((rows) => {
+        res.send({ messages: rows })
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
+});
+
+
 
 router.get("/getChatWithContact", (req, res) => {
     let username = req.query['username']; 
     let contactname = req.query['contactname'];
     let query = `SELECT ChatId
     FROM ChatMembers
-    WHERE MemberId=$2 AND ChatId=Any(SELECT ChatId FROM ChatMembers WHERE MemberId=$1)`
+    WHERE MemberId= (SELECT MemberId FROM Members WHERE Username = test)AND ChatId=Any(SELECT ChatId FROM ChatMembers WHERE MemberId=(SELECT MemberId FROM Members Where Username = bmsg));`
     db.manyOrNone(query, [username, contactname]).then((rows) => {
         res.send({ messages: rows })
     }).catch((err) => {
