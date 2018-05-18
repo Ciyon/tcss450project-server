@@ -74,21 +74,18 @@ router.post("/getChatId", (req, res) => {
     });
 });
 
+//Returns all members in a chat aside from the user who made the request
 router.post("/getChatMembers", (req, res) => {
+    let username = req.body['username'];
     let chatId = req.body['chatId'];
-    let username = req.body['username']; 
-    let query = `SELECT Username                                   
-                    FROM Members                 
-                    WHERE MemberId=(SELECT MemberId FROM ChatMembers WHERE ChatId=$1) 
-                          AND NOT MemberId = (SELECT MemberId FROM Members WHERE Username=$2)`
-    
-        db.manyOrNone(query, [chatId, username]).then((rows) => {
-            res.send({ success:true, chats: rows })
-        }).catch((err) => {
-            res.send({
-                success: false, error: err
-            })
-        });
+    let query = 'SELECT Members.Username FROM Members JOIN ChatMembers ON Members.MemberId = ChatMembers.MemberId WHERE chatId = $1 AND NOT(Members.Username = $2)'
+    db.manyOrNone(query, [chatId,username]).then((rows) => {
+        res.send({ success:true, members: rows })            
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
 });
 
 
