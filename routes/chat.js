@@ -58,10 +58,13 @@ router.post("/joinChat", (req, res) => {
 
 router.post("/getChatId", (req, res) => {
     let username = req.body['username']; 
-    let query = `SELECT ChatId,                                   
+    let query = `SELECT ChatId                                  
                     FROM ChatMembers                 
                     WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
-    
+    // if(!username) {
+    //     res.send({success: false, error: "Username or chatId not supplied"});
+    // }
+
     db.manyOrNone(query, [username]).then((rows) => {
         res.send({ success:true, chats: rows })
     }).catch((err) => {
@@ -78,13 +81,13 @@ router.post("/getChatMembers", (req, res) => {
                     FROM Members                 
                     WHERE MemberId=(SELECT MemberId FROM ChatMembers WHERE ChatId=$1) AND NOT $2`
     
-            db.manyOrNone(query, [chatId, username]).then((rows) => {
-                res.send({ success:true, chats: rows })
-            }).catch((err) => {
-                res.send({
-                    success: false, error: err
-                })
-            });
+        db.manyOrNone(query, [chatId, username]).then((rows) => {
+            res.send({ success:true, chats: rows })
+        }).catch((err) => {
+            res.send({
+                success: false, error: err
+            })
+        });
 });
 
 
