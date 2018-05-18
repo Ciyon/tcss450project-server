@@ -53,29 +53,6 @@ router.post("/removeConnection", (req, res) => {
         });
 });
 
-router.post("/acceptRequest", (req, res) => {
-    let username = req.body['username'];
-    let contactname = req.body['contactname'];
-
-    if (!username || !contactname) {
-        res.send({ success: false, error: "username or contactname not supplied" });
-        return;
-    }
-
-    let update = `UPDATE CONTACTS
-                  SET Verified = 1
-                  WHERE (MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
-                  AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2))`
-
-    db.none(update, [username, contactname])
-        .then(() => { res.send({ success: true }); })
-        .catch((err) => {
-            res.send({
-                success: false, error: err,
-            });
-        });
-});
-
 router.get("/getConnections", (req, res) => {
     let username = req.query['username'];
     let query = `SELECT Username
