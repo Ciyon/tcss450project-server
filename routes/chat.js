@@ -79,7 +79,8 @@ router.post("/getChatMembers", (req, res) => {
     let username = req.body['username']; 
     let query = `SELECT Username                                   
                     FROM Members                 
-                    WHERE MemberId=(SELECT MemberId FROM ChatMembers WHERE ChatId=$1) AND NOT $2`
+                    WHERE MemberId=(SELECT MemberId FROM ChatMembers WHERE ChatId=$1) 
+                          AND NOT (SELECT MemberId FROM Members WHERE Username=$2)`
     
         db.manyOrNone(query, [chatId, username]).then((rows) => {
             res.send({ success:true, chats: rows })
