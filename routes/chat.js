@@ -77,7 +77,7 @@ router.post("/getChatId", (req, res) => {
 router.post("/getChatMembers", (req, res) => {
     let chatId = req.body['chatId'];
     let username = req.body['username']; 
-    let query = `SELECT Username,                                   
+    let query = `SELECT Username                                   
                     FROM Members                 
                     WHERE MemberId=(SELECT MemberId FROM ChatMembers WHERE ChatId=$1) AND NOT $2`
     
