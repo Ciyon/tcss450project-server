@@ -19,7 +19,7 @@ router.post("/addConnection", (req, res) => {
     }
     let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B)
                   SELECT (SELECT MemberId FROM Members WHERE Username= $1) as MemberId_A,
-                  (SELECT MemberId FROM Members WHERE Username= $2) as MemberId_B;`
+                  (SELECT MemberId FROM Members WHERE Username= $2) as MemberId_B`
 
     db.none(insert, [username, contactname])
         .then(() => { res.send({ success: true }); })
@@ -39,10 +39,10 @@ router.post("/removeConnection", (req, res) => {
     }
 
     let del = `DELETE FROM Contacts
-                  WHERE (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
-                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $2))
-                  OR (MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $2) 
-                  AND MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $1))`
+               WHERE (MemberId_A IN (SELECT MemberId FROM Members WHERE Username = $1) 
+               AND MemberId_B IN (SELECT MemberId FROM Members WHERE Username = $2))
+               OR (MemberId_A IN (SELECT MemberId FROM Members WHERE Username = $2) 
+               AND MemberId_B IN (SELECT MemberId FROM Members WHERE Username = $1))`
 
     db.none(del, [username, contactname])
         .then(() => { res.send({ success: true }); })
@@ -64,8 +64,8 @@ router.post("/acceptRequest", (req, res) => {
 
     let update = `UPDATE CONTACTS
                   SET Verified = 1
-                  WHERE (MemberId_B IN (SELECT MemberId FROM Members WHERE MemberId = $1) 
-                  AND MemberId_A IN (SELECT MemberId FROM Members WHERE MemberId = $2))`
+                  WHERE (MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
+                  AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2))`
 
     db.none(update, [username, contactname])
         .then(() => { res.send({ success: true }); })
@@ -79,8 +79,9 @@ router.post("/acceptRequest", (req, res) => {
 router.get("/getConnections", (req, res) => {
     let username = req.query['username'];
     let query = `SELECT Username
-    FROM Contacts
-        WHERE MemberId_A=$1 OR MemberId_B=$1`
+                 FROM Members 
+                 INNER JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
+                 WHERE Username != $1`
     db.manyOrNone(query, [username]).then((rows) => {
         res.send({ messages: rows })
     }).catch((err) => {
@@ -90,15 +91,35 @@ router.get("/getConnections", (req, res) => {
     });
 });
 
-
+// Get an existing row in Contacts between two given users if it exists. Returns
+// the verified status of the connection. Can be used to check if a request or contact
+// already exists.
+router.get("/getExistingConnectionStatus", (req,res) => {
+    let username = req.query['username'];
+    let contactname = req.query['contactname'];
+    let query = `SELECT Verified 
+    FROM Contacts 
+    WHERE (MemberId_A=(SELECT MemberId from Members WHERE Username=$1) 
+            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$2))
+            OR
+            (MemberId_A=(SELECT MemberId from Members WHERE Username=$2) 
+            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$1))`
+    db.manyOrNone(query, [username, contactname]).then((row) => {
+        res.send({ messages: row })
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
+});
 
 router.get("/getChatWithContact", (req, res) => {
     let username = req.query['username']; 
     let contactname = req.query['contactname'];
     let query = `SELECT ChatId
-    FROM ChatMembers
-    WHERE MemberId = (SELECT MemberId FROM Members WHERE Username = $1) AND
-    ChatId=Any(SELECT ChatId FROM ChatMembers WHERE MemberId=(SELECT MemberId FROM Members Where Username = $2));`
+                 FROM ChatMembers
+                 WHERE MemberId = (SELECT MemberId FROM Members WHERE Username = $1) AND
+                 ChatId=Any(SELECT ChatId FROM ChatMembers WHERE MemberId=(SELECT MemberId FROM Members Where Username = $2))`
     db.manyOrNone(query, [username, contactname]).then((rows) => {
         res.send({ messages: rows })
     }).catch((err) => {
