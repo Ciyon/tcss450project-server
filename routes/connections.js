@@ -82,8 +82,16 @@ router.get("/getConnections", (req, res) => {
                  JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
                  WHERE Username != $1 AND Verified = 1
                  Group by Username`
-    db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ messages: rows })
+    db.result(query, [username]).then((result) => {
+        if (result.rowCount == 0)
+        {
+            res.send({success: true, msg: "No Connections found."})
+        }
+        else
+        {
+            res.send({success: true, result: result['rows']})
+        }
+        
     }).catch((err) => {
         res.send({
             success: false, error: err
