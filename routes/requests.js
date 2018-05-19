@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
 router.get("/getSentRequests", (req, res) => {
-    let username = req.query['username']; 
+    let username = req.query['username'];
     let query = `SELECT Username
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_B
     WHERE Verified=0 AND MemberID_A=(SELECT MemberId FROM Members WHERE Username=$1)`
@@ -23,7 +23,7 @@ router.get("/getSentRequests", (req, res) => {
 });
 
 router.get("/getReceivedRequests", (req, res) => {
-    let username = req.query['username']; 
+    let username = req.query['username'];
     let query = `SELECT Username
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_A
     WHERE Verified=0 AND MemberID_B=(SELECT MemberId FROM Members WHERE Username=$1)`
@@ -44,19 +44,40 @@ router.post("/acceptRequest", (req, res) => {
         res.send({ success: false, error: "username or contactname not supplied" });
         return;
     }
+    let select = `SELECT * FROM CONTACTS
+                  WHERE MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
+                  AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2)
+                  AND Verified = 0`
 
-    let update = `UPDATE CONTACTS
-                  SET Verified = 1
-                  WHERE (MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
-                  AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2))`
+    db.result(select, [username, contactname])
+        .then((result) => {
+            if (result.rowCount == 0) {
+                res.send({
+                    success: false, error: "Connection doesn't exist.",
+                });
+            }
+            
+            else {
+                let update = `UPDATE CONTACTS
+                              SET Verified = 1
+                              WHERE MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
+                              AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2)`
 
-    db.none(update, [username, contactname])
-        .then(() => { res.send({ success: true }); })
+                db.none(update, [username, contactname])
+                    .then(() => { res.send({ success: true }); })
+                    .catch((err) => {
+                        res.send({
+                            success: false, error: err,
+                        });
+                    });
+            }
+        })
         .catch((err) => {
             res.send({
                 success: false, error: err,
             });
         });
+
 });
 
 

@@ -80,7 +80,7 @@ router.get("/getConnections", (req, res) => {
     let query = `SELECT Username
                  FROM Members
                  JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
-                 WHERE Username != $1
+                 WHERE Username != $1 AND Verified = 1
                  Group by Username`
     db.manyOrNone(query, [username]).then((rows) => {
         res.send({ messages: rows })
