@@ -21,7 +21,7 @@ router.post("/createChat", (req, res) => {
                   WHERE Username=$1`
     
     db.none(insert, [username])
-        .then(() => { res.send({ success: true }); })
+        .then(() => { res.send({ success: true, message: chatId }); })
         .catch((err) => {
             res.send({
                 success: false, error: err,
