@@ -85,7 +85,7 @@ router.get("/getConnections", (req, res) => {
     db.result(query, [username]).then((result) => {
         if (result.rowCount == 0)
         {
-            res.send({success: true, msg: "No Connections found."})
+            res.send({success: false, msg: "No Connections found."})
         }
         else
         {
