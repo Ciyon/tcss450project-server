@@ -8,7 +8,7 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
-// /createChat creates a new chat session / inserts it into the Chats table
+//createChat creates a new chat session / inserts it into the Chats table
 router.post("/createChat", (req, res) => {
     // TODO: determine what name should be?
     let username = req.body['username'];
