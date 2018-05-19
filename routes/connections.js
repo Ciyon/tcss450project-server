@@ -80,8 +80,8 @@ router.get("/getConnections", (req, res) => {
     let query = `SELECT Firstname, Lastname, Email, Username, MemberId
                  FROM Members
                  JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
-                 WHERE Username != $1 AND Verified = 1
-                 Group by Username, MemberId`
+                 WHERE Username != $1 AND Verified = 1 AND (Contacts.MemberId_A = (SELECT MemberId From Members WHERE Username = $1) 
+                 OR Contacts.MemberId_B = (SELECT MemberId From Members WHERE Username = $1))`
     db.result(query, [username]).then((result) => {
         if (result.rowCount == 0)
         {
