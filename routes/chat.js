@@ -68,24 +68,33 @@ router.post("/joinChat", (req, res) => {
 });
 
 router.post("/addAllToChat", (req, res) => {
-    let select = 'INSERT INTO ChatMembers(chatId, memberId) ';
-
-    let num = 2;
-    let params = new Array();
+    let select = 'INSERT INTO ChatMembers(chatId, memberId) VALUES ';
+    //build a string of values to insert of format ((chatid, memberid), ...)
     let chatId = req.body["chatId"];
     let count = 1;
+    
+    let obj = "memberId" + count;
+    count++;
+    let id = req.body[obj];
+    //append first value in format "(chatId, memberId)""
+    if(id != null) {
+        select += '(' + chatId + ', ' ;
+        select += id + ')';
+    }
+    
+   //append the other values in format ", (chatId, memberId)"
     for(var key in req) {
-        let obj = "username" + count;
+        obj = "memberId" + count;
         count++;
-        let id = req.body[obj];
+        id = req.body[obj];
+    
         if(id != null) {
-            select += '($1,';
-            select += '$' + num + ')';
-            num++
-            params.push(id);
+            select += ', (' + chatId + ', ' ;
+            select += id + ')';
         }
     }
-    db.none(select, [chatId], params)
+
+    db.none(select)
     .then((rows) => {
         res.send({success: true})
     }).catch((err) => {
