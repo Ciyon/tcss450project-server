@@ -77,11 +77,11 @@ router.post("/removeConnection", (req, res) => {
 
 router.get("/getConnections", (req, res) => {
     let username = req.query['username'];
-    let query = `SELECT Username
+    let query = `SELECT Firstname, Lastname, Email, Username, MemberId
                  FROM Members
                  JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
                  WHERE Username != $1 AND Verified = 1
-                 Group by Username`
+                 Group by Username, MemberId`
     db.result(query, [username]).then((result) => {
         if (result.rowCount == 0)
         {
@@ -106,12 +106,12 @@ router.get("/getExistingConnectionStatus", (req, res) => {
     let username = req.query['username'];
     let contactname = req.query['contactname'];
     let query = `SELECT Verified 
-    FROM Contacts 
-    WHERE (MemberId_A=(SELECT MemberId from Members WHERE Username=$1) 
-            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$2))
-            OR
-            (MemberId_A=(SELECT MemberId from Members WHERE Username=$2) 
-            AND MemberId_B=(SELECT MemberId from Members WHERE Username=$1))`
+                 FROM Contacts 
+                 WHERE (MemberId_A=(SELECT MemberId from Members WHERE Username=$1) 
+                 AND MemberId_B=(SELECT MemberId from Members WHERE Username=$2))
+                 OR
+                 (MemberId_A=(SELECT MemberId from Members WHERE Username=$2) 
+                 AND MemberId_B=(SELECT MemberId from Members WHERE Username=$1))`
     db.manyOrNone(query, [username, contactname]).then((row) => {
         res.send({ messages: row })
     }).catch((err) => {
