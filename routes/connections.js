@@ -17,17 +17,39 @@ router.post("/addConnection", (req, res) => {
         res.send({ success: false, error: "username or contactname not supplied" });
         return;
     }
-    let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B)
-                  SELECT (SELECT MemberId FROM Members WHERE Username= $1) as MemberId_A,
-                  (SELECT MemberId FROM Members WHERE Username= $2) as MemberId_B`
+    let select = `SELECT * FROM CONTACTS
+                  WHERE MemberId_A = (SELECT MemberId FROM Members WHERE Username= $1) 
+                  AND MemberId_B = (SELECT MemberId FROM Members WHERE Username= $2)
+                  OR MemberId_A =(SELECT MemberId FROM Members WHERE Username= $2) 
+                  AND MemberId_B=(SELECT MemberId FROM Members WHERE Username= $1);`
+    db.result(select, [username, contactname])
+        .then((result) => {
+            if (result.rowCount != 0) {
+                res.send({
+                    success: false, error: "Connection already exists.",
+                });
+            }
+            else {
+                let insert = `INSERT INTO Contacts(MemberId_A, MemberId_B)
+                              SELECT (SELECT MemberId FROM Members WHERE Username= $1) as MemberId_A,
+                              (SELECT MemberId FROM Members WHERE Username= $2) as MemberId_B`
 
-    db.none(insert, [username, contactname])
-        .then(() => { res.send({ success: true }); })
+                db.none(insert, [username, contactname])
+                    .then(() => { res.send({ success: true }); })
+                    .catch((err) => {
+                        res.send({
+                            success: false, error: err,
+                        });
+                    });
+            }
+        })
         .catch((err) => {
             res.send({
                 success: false, error: err,
             });
         });
+
+
 });
 
 router.post("/removeConnection", (req, res) => {
@@ -53,35 +75,13 @@ router.post("/removeConnection", (req, res) => {
         });
 });
 
-router.post("/acceptRequest", (req, res) => {
-    let username = req.body['username'];
-    let contactname = req.body['contactname'];
-
-    if (!username || !contactname) {
-        res.send({ success: false, error: "username or contactname not supplied" });
-        return;
-    }
-
-    let update = `UPDATE CONTACTS
-                  SET Verified = 1
-                  WHERE (MemberId_B = (SELECT MemberId FROM Members WHERE Username = $1) 
-                  AND MemberId_A = (SELECT MemberId FROM Members WHERE Username = $2))`
-
-    db.none(update, [username, contactname])
-        .then(() => { res.send({ success: true }); })
-        .catch((err) => {
-            res.send({
-                success: false, error: err,
-            });
-        });
-});
-
 router.get("/getConnections", (req, res) => {
     let username = req.query['username'];
     let query = `SELECT Username
-                 FROM Members 
-                 INNER JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
-                 WHERE Username != $1`
+                 FROM Members
+                 JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
+                 WHERE Username != $1
+                 Group by Username`
     db.manyOrNone(query, [username]).then((rows) => {
         res.send({ messages: rows })
     }).catch((err) => {
@@ -94,7 +94,7 @@ router.get("/getConnections", (req, res) => {
 // Get an existing row in Contacts between two given users if it exists. Returns
 // the verified status of the connection. Can be used to check if a request or contact
 // already exists.
-router.get("/getExistingConnectionStatus", (req,res) => {
+router.get("/getExistingConnectionStatus", (req, res) => {
     let username = req.query['username'];
     let contactname = req.query['contactname'];
     let query = `SELECT Verified 
@@ -114,7 +114,7 @@ router.get("/getExistingConnectionStatus", (req,res) => {
 });
 
 router.get("/getChatWithContact", (req, res) => {
-    let username = req.query['username']; 
+    let username = req.query['username'];
     let contactname = req.query['contactname'];
     let query = `SELECT ChatId
                  FROM ChatMembers

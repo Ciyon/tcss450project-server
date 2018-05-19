@@ -19,9 +19,24 @@ router.post("/createChat", (req, res) => {
     let insert = `INSERT INTO Chats(MemberId)
                   SELECT MemberId FROM Members                   
                   WHERE Username=$1`
-    
+
     db.none(insert, [username])
-        .then(() => { res.send({ success: true }); })
+        .then(() => {
+            let select = `SELECT ChatId From Chats 
+                          WHERE MemberId = (SELECT MemberId FROM Members WHERE Username=$1) 
+                          ORDER BY ChatId DESC LIMIT 1;`
+            db.one(select, [username])
+                .then((rows) => {
+                    let chatid = rows['chatid'];
+                    res.send({success: true, chatid});
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false, error: err,
+                    });
+                });
+
+        })
         .catch((err) => {
             res.send({
                 success: false, error: err,
@@ -42,7 +57,7 @@ router.post("/joinChat", (req, res) => {
     let insert = `INSERT INTO ChatMembers(ChatId, MemberId)                   
                   SELECT $1, MemberId FROM Members                   
                   WHERE Username=$2`
-    
+
     db.none(insert, [chatId, username])
         .then(() => { res.send({ success: true }); })
         .catch((err) => {
@@ -57,7 +72,7 @@ router.post("/joinChat", (req, res) => {
 // Get the chatIds of chats sessions a user is part of
 
 router.post("/getChatId", (req, res) => {
-    let username = req.body['username']; 
+    let username = req.body['username'];
     let query = `SELECT ChatId                                  
                     FROM ChatMembers                 
                     WHERE MemberId=(SELECT MemberId FROM Members WHERE Username=$1)`
@@ -66,7 +81,7 @@ router.post("/getChatId", (req, res) => {
     // }
 
     db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ success:true, chats: rows })
+        res.send({ success: true, chats: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
@@ -90,10 +105,10 @@ router.post("/getChatMembers", (req, res) => {
 
 //change
 router.post("/leaveChat", (req, res) => {
-    let username = req.body['username']; 
+    let username = req.body['username'];
     let chatId = req.body['chatId'];
-    if(username && chatId) {
-        
+    if (username && chatId) {
+
         let del = `DELETE FROM ChatMembers
                         WHERE ChatId = $1 AND MemberId = 
                         (SELECT MemberId FROM Members WHERE Username=$2)`
@@ -105,7 +120,7 @@ router.post("/leaveChat", (req, res) => {
                     success: false, error: err,
                 })
             });
-        
+
     } else {
         if (!username) {
             res.send({ success: false, error: "Username not supplied" });
@@ -116,6 +131,6 @@ router.post("/leaveChat", (req, res) => {
             return;
         }
     }
-    
+
 });
 module.exports = router; 
