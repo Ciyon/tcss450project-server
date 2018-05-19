@@ -8,7 +8,6 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
-//Test
 //createChat creates a new chat session / inserts it into the Chats table
 router.post("/createChat", (req, res) => {
     // TODO: determine what name should be?
@@ -68,6 +67,34 @@ router.post("/joinChat", (req, res) => {
         });
 });
 
+router.post("/addAllToChat", (req, res) => {
+    let select = 'INSERT INTO ChatMembers(chatId, memberId) ';
+
+    let num = 2;
+    let params = new Array();
+    let chatId = req.body["chatId"];
+    let count = 1;
+    for(var key in req) {
+        let obj = "username" + count;
+        count++;
+        let id = req.body[obj];
+        if(id != null) {
+            select += '($1,';
+            select += '$' + num + ')';
+            num++
+            params.push(id);
+        }
+    }
+    db.none(select, [chatId], params)
+    .then((rows) => {
+        res.send({success: true})
+    }).catch((err) => {
+        res.send({
+            success: false,
+            error: err
+        })
+    })
+});
 
 
 // Get the chatIds of chats sessions a user is part of

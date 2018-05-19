@@ -75,8 +75,8 @@ router.post("/removeConnection", (req, res) => {
         });
 });
 
-router.get("/getConnections", (req, res) => {
-    let username = req.query['username'];
+router.post("/getConnections", (req, res) => {
+    let username = req.body['username'];
     let query = `SELECT Firstname, Lastname, Email, Username, MemberId
                  FROM Members
                  JOIN Contacts ON MemberId = Contacts.MemberId_A OR MemberId = Contacts.MemberId_B
