@@ -7,6 +7,7 @@ let db = require('../utilities/utils').db;
 var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
+
 router.post("/sendMessages", (req, res) => {
     let username = req.body['username'];
     let message = req.body['message'];
@@ -28,8 +29,8 @@ router.post("/sendMessages", (req, res) => {
         });
 });
 
-router.get("/getAllMessages", (req, res) => {
-    let chatId = req.query['chatId']; 
+router.post("/getAllMessages", (req, res) => {
+    let chatId = req.body['chatId']; 
     let query = `SELECT Members.Username, Messages.Message,                   
     to_char(Messages.Timestamp AT TIME ZONE 'PDT', 'YYYY-MM-DD HH24:MI:SS.US' ) AS Timestamp                  
     FROM Messages                  
@@ -37,7 +38,8 @@ router.get("/getAllMessages", (req, res) => {
     WHERE ChatId=$1                
     ORDER BY Timestamp ASC`
     db.manyOrNone(query, [chatId]).then((rows) => {
-        res.send({ messages: rows })
+        res.send({ success: true,
+                    messages: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
