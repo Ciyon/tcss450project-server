@@ -176,9 +176,7 @@ router.post("/getChatInformation", (req, res) => {
     if (username) {
         let select = `SELECT ChatId, Username FROM ChatMembers
                       JOIN Members ON Members.MemberId = ChatMembers.MemberId
-                      WHERE ChatId IN 
-                      (SELECT ChatId FROM ChatMembers WHERE MemberId = (SELECT MemberId FROM Members WHERE Username= $1))
-                      AND Members.MemberId != (SELECT MemberId FROM Members WHERE Username= $1)
+                      WHERE ChatId IN (SELECT ChatId FROM ChatMembers WHERE MemberId = (SELECT MemberId FROM Members WHERE Username= $1))
                       Group by ChatId, Username;`
 
         db.result(select, [username]).then((result) =>
