@@ -28,7 +28,7 @@ router.post("/createChat", (req, res) => {
             db.one(select, [username])
                 .then((rows) => {
                     let chatid = rows['chatid'];
-                    res.send({success: true, chatid});
+                    res.send({ success: true, chatid });
                 })
                 .catch((err) => {
                     res.send({
@@ -72,37 +72,37 @@ router.post("/addAllToChat", (req, res) => {
     //build a string of values to insert of format ((chatid, memberid), ...)
     let chatId = req.body["chatId"];
     let count = 1;
-    
+
     let obj = "memberId" + count;
     count++;
     let id = req.body[obj];
     //append first value in format "(chatId, memberId)""
-    if(id != null) {
-        select += '(' + chatId + ', ' ;
+    if (id != null) {
+        select += '(' + chatId + ', ';
         select += id + ')';
     }
-    
-   //append the other values in format ", (chatId, memberId)"
-    for(var key in req) {
+
+    //append the other values in format ", (chatId, memberId)"
+    for (var key in req) {
         obj = "memberId" + count;
         count++;
         id = req.body[obj];
-    
-        if(id != null) {
-            select += ', (' + chatId + ', ' ;
+
+        if (id != null) {
+            select += ', (' + chatId + ', ';
             select += id + ')';
         }
     }
 
     db.none(select)
-    .then((rows) => {
-        res.send({success: true})
-    }).catch((err) => {
-        res.send({
-            success: false,
-            error: err
+        .then((rows) => {
+            res.send({ success: true })
+        }).catch((err) => {
+            res.send({
+                success: false,
+                error: err
+            })
         })
-    })
 });
 
 
@@ -131,8 +131,8 @@ router.post("/getChatMembers", (req, res) => {
     let username = req.body['username'];
     let chatId = req.body['chatId'];
     let query = 'SELECT Members.Username FROM Members JOIN ChatMembers ON Members.MemberId = ChatMembers.MemberId WHERE chatId = $1 AND NOT(Members.Username = $2)'
-    db.manyOrNone(query, [chatId,username]).then((rows) => {
-        res.send({ success:true, members: rows })            
+    db.manyOrNone(query, [chatId, username]).then((rows) => {
+        res.send({ success: true, members: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
@@ -167,6 +167,31 @@ router.post("/leaveChat", (req, res) => {
             res.send({ success: false, error: "chatId not supplied" });
             return;
         }
+    }
+
+});
+
+router.post("/getChatInformation", (req, res) => {
+    let username = req.body['username'];
+    if (username) {
+        let select = `SELECT ChatId, Username FROM ChatMembers
+                      JOIN Members ON Members.MemberId = ChatMembers.MemberId
+                      WHERE ChatId IN 
+                      (SELECT ChatId FROM ChatMembers WHERE MemberId = (SELECT MemberId FROM Members WHERE Username= $1))
+                      AND Members.MemberId != (SELECT MemberId FROM Members WHERE Username= $1)
+                      Group by ChatId, Username;`
+
+        db.result(select, [username]).then((result) =>
+        {
+        if (result.rowCount == 0)
+        {
+            res.send({ success: false, error: "ChatInformation not found for given username"})
+        }
+        else
+        {
+            res.send({success: true, chatInformation: result.rows})
+        }
+    })
     }
 
 });
