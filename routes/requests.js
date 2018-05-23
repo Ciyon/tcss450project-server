@@ -21,7 +21,7 @@ router.post("/getSentRequests", (req, res) => {
         })
     });
 });
-
+//test
 router.post("/getReceivedRequests", (req, res) => {
     let username = req.body['username'];
     let query = `SELECT Username
