@@ -8,8 +8,8 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
-router.get("/getSentRequests", (req, res) => {
-    let username = req.query['username'];
+router.post("/getSentRequests", (req, res) => {
+    let username = req.body['username'];
     let query = `SELECT Username
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_B
     WHERE Verified=0 AND MemberID_A=(SELECT MemberId FROM Members WHERE Username=$1)`
@@ -22,8 +22,8 @@ router.get("/getSentRequests", (req, res) => {
     });
 });
 
-router.get("/getReceivedRequests", (req, res) => {
-    let username = req.query['username'];
+router.post("/getReceivedRequests", (req, res) => {
+    let username = req.body['username'];
     let query = `SELECT Username
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_A
     WHERE Verified=0 AND MemberID_B=(SELECT MemberId FROM Members WHERE Username=$1)`
