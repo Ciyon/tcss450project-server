@@ -14,7 +14,7 @@ router.post("/getSentRequests", (req, res) => {
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_B
     WHERE Verified=0 AND MemberID_A=(SELECT MemberId FROM Members WHERE Username=$1)`
     db.manyOrNone(query, [username]).then((rows) => {
-        res.send({ requests: rows })
+        res.send({ success: true, requests: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
@@ -28,7 +28,7 @@ router.post("/getReceivedRequests", (req, res) => {
     FROM Members JOIN Contacts ON Members.MemberId=Contacts.MemberID_A
     WHERE Verified=0 AND MemberID_B=(SELECT MemberId FROM Members WHERE Username=$1)`
     db.manyOrNone(query, [username, 0]).then((rows) => {
-        res.send({ requests: rows })
+        res.send({ success:true, requests: rows })
     }).catch((err) => {
         res.send({
             success: false, error: err
