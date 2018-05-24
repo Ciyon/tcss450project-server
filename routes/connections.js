@@ -99,6 +99,36 @@ router.post("/getConnections", (req, res) => {
     });
 });
 
+router.post("/getUnconnectedMembers", (req, res) => {
+    let id = req.body['memberId'];
+
+    let query = `SELECT Members.Username From Members 
+                INNER JOIN
+                (SELECT MemberId as ID FROM Members 
+                WHERE MemberId != $1 
+                EXCEPT 
+                (SELECT MemberId_B as ID FROM Contacts WHERE MemberId_A = $1 
+                UNION 
+                SELECT MemberId_A as ID FROM Contacts WHERE MemberId_B = $1)) AS Ids 
+                ON Members.MemberId = IDs.ID`
+ 
+                 
+    db.result(query, [id]).then((result) => {
+        if (result.rowCount == 0)
+        {
+            res.send({success: false, msg: "No Connections found."})
+        }
+        else
+        {
+            res.send({success: true, result: result['rows']})
+        }
+        
+    }).catch((err) => {
+        res.send({
+            success: false, error: err
+        })
+    });
+});
 // Get an existing row in Contacts between two given users if it exists. Returns
 // the verified status of the connection. Can be used to check if a request or contact
 // already exists.
