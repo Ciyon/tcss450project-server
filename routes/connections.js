@@ -52,6 +52,7 @@ router.post("/addConnection", (req, res) => {
 
 });
 
+// If the username and contactname are connected, remove it
 router.post("/removeConnection", (req, res) => {
     let username = req.body['username'];
     let contactname = req.body['contactname'];
@@ -75,6 +76,7 @@ router.post("/removeConnection", (req, res) => {
         });
 });
 
+// Get all the connections for the given username
 router.post("/getConnections", (req, res) => {
     let username = req.body['username'];
     let query = `SELECT Firstname, Lastname, Email, Username, MemberId
@@ -99,6 +101,7 @@ router.post("/getConnections", (req, res) => {
     });
 });
 
+// Get all members who are not connected with the given memberid
 router.post("/getUnconnectedMembers", (req, res) => {
     let id = req.body['memberId'];
 
@@ -151,6 +154,7 @@ router.get("/getExistingConnectionStatus", (req, res) => {
     });
 });
 
+// Gets all chats with the given username and contactname
 router.get("/getChatWithContact", (req, res) => {
     let username = req.query['username'];
     let contactname = req.query['contactname'];

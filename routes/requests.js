@@ -8,6 +8,7 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 router.use(bodyParser.json());
 
+// Retrieve all requests that have been sent by the user
 router.post("/getSentRequests", (req, res) => {
     let username = req.body['username'];
     let query = `SELECT Username
@@ -21,7 +22,8 @@ router.post("/getSentRequests", (req, res) => {
         })
     });
 });
-//test
+
+// Retrieve all requests that have been sent to the user
 router.post("/getReceivedRequests", (req, res) => {
     let username = req.body['username'];
     let query = `SELECT Username
@@ -36,6 +38,7 @@ router.post("/getReceivedRequests", (req, res) => {
     });
 });
 
+// Given a username and contactname, establishes a connection
 router.post("/acceptRequest", (req, res) => {
     let username = req.body['username'];
     let contactname = req.body['contactname'];

@@ -67,6 +67,7 @@ router.post("/joinChat", (req, res) => {
         });
 });
 
+// Adds all memberids given to the chatid given
 router.post("/addAllToChat", (req, res) => {
     let select = 'INSERT INTO ChatMembers(chatId, memberId) VALUES ';
     //build a string of values to insert of format ((chatid, memberid), ...)
@@ -140,7 +141,7 @@ router.post("/getChatMembers", (req, res) => {
     });
 });
 
-//change
+// Removes the username from the given chatid
 router.post("/leaveChat", (req, res) => {
     let username = req.body['username'];
     let chatId = req.body['chatId'];
@@ -171,6 +172,7 @@ router.post("/leaveChat", (req, res) => {
 
 });
 
+// Retrieves all chat information for the given user
 router.post("/getChatInformation", (req, res) => {
     let username = req.body['username'];
     if (username) {

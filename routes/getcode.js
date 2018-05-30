@@ -12,6 +12,8 @@ const bodyParser = require("body-parser");
 
 var router = express.Router();
 router.use(bodyParser.json());
+
+// Sends an email with a reset code to allow the user to reset their password
 router.post('/', (req, res) => {
     var email = req.body['email'];
     if (email) {
