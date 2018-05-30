@@ -16,12 +16,13 @@ let sendEmail = require('../utilities/utils').sendEmail;
 var router = express.Router();
 router.use(bodyParser.json());
 
+// Resets the users password given a valid email, password, and verification code
 router.post('/', (req, res) => {
-    res.type("application/json");
     var email = req.body['email'].toLowerCase();
     var password = req.body['password'];
     var code = req.body['code'];
     if (email && password && code) {
+        // If the email doesn't include an "@" sign
         if (!email.includes("@")) {
             res.send({
                 success: false,
@@ -29,12 +30,17 @@ router.post('/', (req, res) => {
             })
         }
         else {
+            // Select the member with the given email
             db.result(`SELECT * FROM MEMBERS
                        WHERE EMAIL= $1`, [email])
                 .then(result => {
+                    // Get todays date
                     var today = new Date();
+                    // Get the resetcode
                     var resetcode = result.rows[0]["resetcode"];
+                    // Get the expiration of the code
                     var expire = result.rows[0]["expire"];
+                    // If the code is expired
                     if (!expire >= today) {
                         res.send({
                             success: false,
@@ -42,6 +48,7 @@ router.post('/', (req, res) => {
                         })
                     }
                     else {
+                        // If the code doesn't match to the email provided
                         if (code != resetcode) {
                             res.send({
                                 success: false,
@@ -49,9 +56,10 @@ router.post('/', (req, res) => {
                             })
                         }
                         else {
+                            // Create a new hashed password 
                             let salt = crypto.randomBytes(32).toString("hex");
                             let salted_hash = getHash(password, salt);
-
+                            // If the given password is too short
                             if (password.length < 5) {
                                 res.send({
                                     success: false,
@@ -59,6 +67,7 @@ router.post('/', (req, res) => {
                                 });
                             }
                             else {
+                                // Update the database with the new information
                                 var params = [email, salted_hash, salt];
                                 db.none(`UPDATE MEMBERS 
                                         SET Password = $2, Salt = $3, ResetCode = NULL, Expire = NULL 
@@ -68,6 +77,7 @@ router.post('/', (req, res) => {
                                             success: true
                                         });
                                         var message = "Your password has been updated.";
+                                        // Send a confirmation email
                                         sendEmail(email, "Password Reset Confirmation", message);
                                     })
                             }
@@ -79,6 +89,7 @@ router.post('/', (req, res) => {
 
 
         }
+    // If the email, password or code are not given.
     } else {
         res.send({
             success: false,

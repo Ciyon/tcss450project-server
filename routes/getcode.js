@@ -12,9 +12,7 @@ const bodyParser = require("body-parser");
 
 var router = express.Router();
 router.use(bodyParser.json());
-
 router.post('/', (req, res) => {
-    res.type("application/json");
     var email = req.body['email'];
     if (email) {
         if (!email.includes("@")) {

@@ -1,16 +1,14 @@
+/**
+ * TCSS 450 Group 4 Server code
+ */
+
 //express is the framework we're going to use to handle requests
 const express = require('express');
 //Create a new instance of express
 const app = express();
 const FormData = require("form-data");
 
-//We use this create the SHA256 hash
-//const crypto = require("crypto");
-//pg-promise is a postgres library that uses javascript promises
-//const pgp = require('pg-promise')();
-//We have to set ssl usage to true for Heroku to accept our connection
-//pgp.pg.defaults.ssl = true;
-
+// endpoints
 var login = require('./routes/login.js');
 app.use('/login', login);
 var reg = require('./routes/register.js');
